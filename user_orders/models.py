@@ -26,8 +26,9 @@ class Address(models.Model):
 # This model is used to store orders placed by users
 # It includes a foreign key to the User model and a foreign key to the Product model
 class Order(models.Model):
+    
     user = models.ForeignKey(User, on_delete = models.CASCADE)
-    product = models.ForeignKey(Product, on_delete = models.CASCADE)
+    Product = models.ForeignKey(Product, on_delete = models.CASCADE)
     quantity = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -56,7 +57,7 @@ class OrderItem(models.Model):
         ordering = ['-id']
 
     def __str__(self):
-        return f"Order Item {self.id} for Order {self.order.id} - {self.product.name}"
+        return f"Order Item {self.id} for Order {self.order.id} - {self.Product.name}"
     
 
 

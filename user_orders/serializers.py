@@ -1,7 +1,7 @@
 from .models import Address, Order, OrderItem, Payment
 from rest_framework import serializers
 from django.contrib.auth.models import User
-
+from Products.models import Product
 # Serializers
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -12,10 +12,13 @@ class AddressSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+
     class Meta:
         model = OrderItem
-        fields = '__all__'
+        fields = ['product', 'quantity', 'price']
         read_only_fields = ['order', 'user', 'price']
+        #exclude = ["order"]
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -27,12 +30,24 @@ class OrderSerializer(serializers.ModelSerializer):
         read_only_fields = ['user', 'created_at', 'updated_at', 'total_price']
 
     def create(self, validated_data):
-        order_items_data = validated_data.pop('items',[])
+        order_items_data = validated_data.pop('items', [])
         user = self.context['request'].user
-        order = Order.objects.create(user = user, **validated_data)
-        
+
+        total_price = 0
+
         for item_data in order_items_data:
-            OrderItem.objects.create(order=order, user = user, **item_data)
+            product = item_data['product']
+            quantity = item_data['quantity']
+            total_price += product.price * quantity
+
+        order = Order.objects.create(user=user, total_price=total_price, **validated_data)
+
+        for item_data in order_items_data:
+            item_data.pop('user', None)
+            product = item_data['product']
+            item_data['price'] = product.price  # Set price here
+            OrderItem.objects.create(order=order, user=user, **item_data)
+
         return order
 
 
@@ -42,7 +57,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         model = Payment
 
         fields = '__all__'
-        read_only_fields = ['order', 'user']
+        read_only_fields = ['user']
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -69,4 +84,3 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
         return user
-        
