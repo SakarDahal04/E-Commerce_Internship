@@ -1,6 +1,6 @@
 from rest_framework import mixins
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 from product.api.serializers import (
     ProductSerializer,
@@ -113,7 +113,7 @@ class TagDetailAPIView(
 
 class StripeAPIPayment(mixins.CreateModelMixin, generics.GenericAPIView):
     serializer_class = PaymentSerializer
-    queryset = Tags.objects.all()
+    queryset = Product.objects.all()
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
