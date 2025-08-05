@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,10 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'user_orders',
-    'Products',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
+    'Products',
 ]
 
 MIDDLEWARE = [
@@ -141,8 +143,8 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '3/minute',
-        'user': '3/minute',
+        'anon': '100/minute',
+        'user': '100/minute',
         'checkout': '1/minute',
     },
     
@@ -158,3 +160,11 @@ CACHES = {
 
     }
 }
+
+
+#stripe_api
+
+load_dotenv()
+
+STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')

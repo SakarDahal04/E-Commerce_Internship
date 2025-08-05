@@ -13,28 +13,29 @@ class AddressSerializer(serializers.ModelSerializer):
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    order = serializers.StringRelatedField(read_only=True) 
 
     class Meta:
         model = OrderItem
-        fields = ['product', 'quantity', 'price']
-        read_only_fields = ['order', 'user', 'price']
-        #exclude = ["order"]
+        fields = ['product', 'quantity', 'price','order']
+        read_only_fields = ['order', 'price']
+   
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    order_items = OrderItemSerializer(many=True, source='items')
+    order_items = OrderItemSerializer(many=True, source='items', required=False)
 
     class Meta:
         model = Order
-        fields = '__all__'
-        read_only_fields = ['user', 'created_at', 'updated_at', 'total_price']
+        fields = ['id', 'quantity', 'created_at', 'updated_at', 'total_price', 'product', 'order_items']
+        read_only_fields = ['created_at', 'updated_at', 'total_price']
 
     def create(self, validated_data):
         order_items_data = validated_data.pop('items', [])
+        product = validated_data.get('product')
         user = self.context['request'].user
 
         total_price = 0
-
         for item_data in order_items_data:
             product = item_data['product']
             quantity = item_data['quantity']
@@ -45,12 +46,13 @@ class OrderSerializer(serializers.ModelSerializer):
         for item_data in order_items_data:
             item_data.pop('user', None)
             product = item_data['product']
-            item_data['price'] = product.price  # Set price here
+            item_data['price'] = product.price
             OrderItem.objects.create(order=order, user=user, **item_data)
 
         return order
 
 
+    
 
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:

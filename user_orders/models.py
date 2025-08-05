@@ -28,8 +28,8 @@ class Address(models.Model):
 class Order(models.Model):
     
     user = models.ForeignKey(User, on_delete = models.CASCADE)
-    Product = models.ForeignKey(Product, on_delete = models.CASCADE)
     quantity = models.PositiveIntegerField()
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=50, default='Pending')
