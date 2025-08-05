@@ -20,3 +20,4 @@ db.sqlite
 media/
 staticfiles/
 
+account/
