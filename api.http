@@ -1,0 +1,10 @@
+PATCH http://127.0.0.1:8000/cart/items/select/
+Content-Type: application/json
+
+{
+  "items": [
+    { "id": 6, "selected_for_checkout": true },
+    { "id": 7, "selected_for_checkout": true },
+    { "id": 8, "selected_for_checkout": false }
+  ]
+}
