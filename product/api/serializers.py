@@ -5,7 +5,7 @@ from product.models import Product, Category, Tags, Review
 class CategorySerialzier(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = "__all__"
+        fields = "__all__" 
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -28,7 +28,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class PaymentSerializer(serializers.Serializer):
-    card_number = serializers.CharField(max_length=100, required=True)
-    expiry_month = serializers.CharField(max_length=100, required=True)
-    expiry_year = serializers.CharField(max_length=100, required=True)
-    cvc = serializers.CharField(max_length=100, required=True)
+    card_number = serializers.IntegerField()
+    expiry_month = serializers.IntegerField()
+    expiry_year = serializers.IntegerField()
+    cvc = serializers.IntegerField()

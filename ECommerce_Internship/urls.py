@@ -27,7 +27,7 @@ urlpatterns = [
     path('api/product/', include('product.api.urls')),
     path('api/auth_dipesh/', include('auth_dipesh.api.urls')),
 
-    path("api/token/", TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path("api/token/", TokenObtainPairView.as_view(), name='token_obtain_pair'), #jwt access and refresh tokens
     path("api/token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
-    path('o/', include(oauth2_urls)),
+    path('o/', include(oauth2_urls)), # oauth access token
 ]

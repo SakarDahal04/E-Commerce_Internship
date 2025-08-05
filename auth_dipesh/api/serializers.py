@@ -23,6 +23,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         address_id = Address.objects.create(**address_data)
         user = CustomUser.objects.create_user(password=raw_password, address=address_id, **validated_data)
         return user
+
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()

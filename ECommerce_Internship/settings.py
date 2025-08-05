@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'oauth2_provider',
     'rest_framework',
+    'django_filters',
+
     #Installed apps
     'product',
     'auth_dipesh',
@@ -138,6 +140,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
 
+ 'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
