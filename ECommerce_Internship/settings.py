@@ -142,7 +142,16 @@ REST_FRAMEWORK = {
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
 
-    )
+    ),
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '1000/day',
+        'custom': '500/day',
+    }
 
 }
 OAUTH2_PROVIDER = {
@@ -152,3 +161,5 @@ OAUTH2_PROVIDER = {
 
 }
 LOGIN_URL = '/admin/login/'
+# from rest_framework.throttling import AnonRateThrottle
+# from rest_framework.throttling import UserRateThrottle

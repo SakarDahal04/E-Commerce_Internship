@@ -10,7 +10,7 @@ class Address(models.Model):
 
 class CustomUser(AbstractUser):
     native_name = models.CharField(max_length=100, blank=True, help_text="please enter your name")
-    address = models.OneToOneField(Address, on_delete=models.CASCADE, help_text="Enter the address", blank=True)
+    address = models.OneToOneField(Address, on_delete=models.CASCADE, help_text="Enter the address", blank=True, null=True)
     phone_no = models.PositiveBigIntegerField(blank=True, null=True)
     # profile_picture = models.ImageField()
     created_at = models.DateTimeField(auto_now_add=True)
