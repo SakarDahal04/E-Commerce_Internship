@@ -11,16 +11,13 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-from decouple import config
-
-STRIPE_SECRET_KEY=config('STRIPE_SECRET_KEY')
-STRIPE_PUBLISHABLE_KEY=config('STRIPE_PUBLISHABLE_KEY')
-AUTH_USER_MODEL = 'auth_dipesh.CustomUser'
 import os
 from datetime import timedelta
 
 from dotenv import load_dotenv
 load_dotenv()
+from decouple import config
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -60,18 +57,13 @@ INSTALLED_APPS = [
 
     #Installed apps
     'product',
-    'auth_dipesh',
     'cart',
     'account',
+    'user_orders',
 
 ]
 CORS_ALLOWED_ORIGINS = ['*']
-ALLOWED_HOSTS = ['*'    'user_orders',
-    'rest_framework',
-    'rest_framework.authtoken',
-    'rest_framework_simplejwt',
-    'Products',
-]
+ALLOWED_HOSTS = ['*']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -161,6 +153,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
 
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
  'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
@@ -177,6 +171,7 @@ REST_FRAMEWORK = {
         'anon': '100/day',
         'user': '1000/day',
         'custom': '500/day',
+        'checkout': '1/minute',
     }
 
 }
@@ -197,11 +192,6 @@ INTERNAL_IPS = [
     # ...
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
-}
 
 SITE_NAME = 'My Ecommerce'
 
@@ -258,43 +248,3 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',  
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
-    
-    'DEFAULT_THROTTLE_CLASSES':[
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle',
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/minute',
-        'user': '100/minute',
-        'checkout': '1/minute',
-    },
-    
-}
-
-CACHES = {
-    "default" : {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient"
-        }
-
-    }
-}
-
-
-#stripe_api
-
-load_dotenv()
-
-STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
-STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
