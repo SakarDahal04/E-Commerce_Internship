@@ -49,21 +49,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'rest_framework',
-    "debug_toolbar",
 
-    'cart',
-    'account',
 
     #Third Party apps
     'rest_framework_simplejwt',
     'oauth2_provider',
     'rest_framework',
     'django_filters',
+    "debug_toolbar",
 
     #Installed apps
     'product',
     'auth_dipesh',
+    'cart',
+    'account',
 
 ]
 CORS_ALLOWED_ORIGINS = ['*']
