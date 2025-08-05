@@ -8,7 +8,7 @@ __pycache__/
 *.pot
 *.pyc
 *.pyo
-
+auth_dipesh/
 db.sqlite3
 
 db.sqlite

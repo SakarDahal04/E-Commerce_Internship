@@ -5,11 +5,6 @@ class CreateUpdateDate(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def show_name(self):
-        return 
-
-
-
     class Meta:
         abstract = True
 
