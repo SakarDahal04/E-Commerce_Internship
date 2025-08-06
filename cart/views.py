@@ -162,19 +162,20 @@ class CheckoutRequestView(APIView):
         total = Decimal("0.00")
 
         for item in cart_items:
+            total += (item.quantity * item.product.price)
             if item.quantity > item.product.stock:
                 return Response({
                     "detail": f"Not enough stock for {item.product.name} (Available: {item.product.stock})"
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-        order = Order.objects.create(user=user, total=total, status="Pending")
+        order = Order.objects.create(user=user, total_price=total, status="Pending")
 
         for item in cart_items:
             OrderItem.objects.create(
                 order=order,
                 product = item.product,
                 quantity = item.quantity,
-                # price = item.product.price,
+                price = item.product.price * item.quantity,
                 # item_subtotal = item.quantity * item.product.price
             )
 
@@ -184,8 +185,8 @@ class CheckoutRequestView(APIView):
 
         return Response({
             "detail": "Order created successfully",
-            "order_id": str(order.order_id),
-            "total": str(order.total)
+            "order_id": str(order.id),
+            "total": str(order.total_price)
         }, status=status.HTTP_201_CREATED)
 
     def delete(self, request):

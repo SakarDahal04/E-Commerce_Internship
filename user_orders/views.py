@@ -144,6 +144,10 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class LoginView(ObtainAuthToken):
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
+    permission_classes = [AllowAny]
+    authentication_classes = []
+    
+
     def post(self, request, *args, **kwargs):
         
         serializer = self.serializer_class(data=request.data,

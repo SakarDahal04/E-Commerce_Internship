@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 
     #Third Party apps
     'rest_framework_simplejwt',
+    'rest_framework.authtoken',
     'oauth2_provider',
     'rest_framework',
     'django_filters',
@@ -158,6 +159,7 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
 
