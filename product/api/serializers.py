@@ -17,12 +17,22 @@ class TagSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerialzier()
     tags = TagSerializer()
+    average_rating = serializers.SerializerMethodField()
+
     class Meta:
         model = Product
         fields = "__all__"
+        extra_fields = ['average_rating']
+    
+    def get_average_rating(self, obj):
+        reviews = obj.review_product.all()
+        if reviews.exists():
+            return round(sum([r.rating for r in reviews]) / reviews.count(), 2)
 
 class ReviewSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
+
+    #aba average rating kasari calculate garne ta
     class Meta:
         model = Review
         fields = "__all__"

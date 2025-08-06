@@ -26,7 +26,6 @@ class Product(CreateUpdateDate):
         Category, on_delete=models.CASCADE, related_name="product_category", null=True, blank=True
     )
     tags = models.ForeignKey(Tags, on_delete=models.CASCADE, related_name="product_tags", null=True, blank=True)
-    
     name = models.CharField(max_length=100, db_index=True)
     description = models.TextField(max_length=500, blank=True)
     price = models.DecimalField(max_digits=9, decimal_places=2)
@@ -57,4 +56,4 @@ class Review(CreateUpdateDate):
     comment = models.TextField()
 
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.product.name} Review"
