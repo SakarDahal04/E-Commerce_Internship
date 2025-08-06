@@ -1,7 +1,7 @@
 from .models import Address, Order, OrderItem, Payment
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from Products.models import Product
+from product.models import Product
 # Serializers
 
 class AddressSerializer(serializers.ModelSerializer):

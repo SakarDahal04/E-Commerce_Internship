@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 
 from django.contrib.auth.models import User
-from cart.models import Cart, CartItem, Order, OrderItem     # dummy model for Product
+from cart.models import Cart, CartItem 
+from user_orders.models import Order, OrderItem
 from product.models import Product
 from cart.serializers import CartSerializer, CartItemSerializer, OrderCreateSerializer, CartItemUpdateSerializer, OrderSerializer
 

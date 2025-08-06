@@ -58,11 +58,10 @@ INSTALLED_APPS = [
     #Installed apps
     'product',
     'cart',
-    'account',
     'user_orders',
 
 ]
-CORS_ALLOWED_ORIGINS = ['*']
+CORS_ALLOWED_ORIGINS = ['https://localhost.com']
 ALLOWED_HOSTS = ['*']
 
 MIDDLEWARE = [

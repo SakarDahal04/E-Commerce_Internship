@@ -1,6 +1,8 @@
 from django.contrib import admin
 
-from cart.models import Cart, CartItem, Product, OrderItem, Order
+from cart.models import Cart, CartItem
+from user_orders.models import Order, OrderItem
+from product.models import Product
 # Register your models here.
 
 

@@ -1,5 +1,5 @@
 from django.urls import path
-from cart import views
+from cart.views import CartItemAddAPIView, CartItemListView, CheckoutRequestView
 
 urlpatterns = [
     # path('my-cart/', views.CartRetrieveAPIView.as_view(), name="cart-info"),
@@ -10,9 +10,9 @@ urlpatterns = [
     # path('checkout/', views.OrderCheckoutCreateAPIView.as_view(), name='checkout'),
 
 
-    path('add-item/', views.CartItemAddAPIView.as_view(), name='cart-item-add'),
-    path("list-cart/", views.CartItemListView.as_view(), name="list-cart"),
-    path("checkout-request/", views.CheckoutRequestView.as_view(), name="checkout-request"),
+    path('add-item/',CartItemAddAPIView.as_view(), name='cart-item-add'),
+    path("list-cart/", CartItemListView.as_view(), name="list-cart"),
+    path("checkout-request/", CheckoutRequestView.as_view(), name="checkout-request"),
 
     # path("update-cart/<int:pk>/", views.CartItemUpdateView.as_view(), name="update-cart"),
     # path('create-stripe-session/', views.StripeCheckoutSessionAPIView.as_view(), name="stripe-session"),

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from cart.models import Cart, CartItem, Product, Order, OrderItem
+from cart.models import Cart, CartItem, Product
+from user_orders.models import Order, OrderItem
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
