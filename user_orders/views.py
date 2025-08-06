@@ -142,7 +142,7 @@ class UserViewSet(viewsets.ModelViewSet):
         
 
 
-class LoginView(ObtainAuthToken):
+""" class LoginView(ObtainAuthToken):
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
     permission_classes = [AllowAny]
     authentication_classes = []
@@ -163,4 +163,4 @@ class LoginView(ObtainAuthToken):
             'token': token.key,
             'user_id': user.pk,
             'username': user.username
-        })
+        }) """

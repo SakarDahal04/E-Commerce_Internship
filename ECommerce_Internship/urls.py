@@ -24,19 +24,21 @@ from oauth2_provider import urls as oauth2_urls
 
 from django.urls import include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
-from rest_framework.authtoken.views import obtain_auth_token
-from user_orders.views import LoginView  
+#from rest_framework.authtoken.views import obtain_auth_token
+ 
    
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/user_orders', include('user_orders.urls')),
     path('api/product/', include('product.api.urls')),
     path('cart/', include('cart.urls')),
-    path('api/login/', LoginView.as_view(), name='api-login'),  
+    #path('api/login/', LoginView.as_view(), name='api-login'),  
 
     path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+   # path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+   # path('api/auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     path('o/', include(oauth2_urls)), # oauth access token
     path('api-auth/', include('rest_framework.urls')),
