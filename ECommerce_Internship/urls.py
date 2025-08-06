@@ -19,7 +19,7 @@ from django.urls import path
 from django.urls import include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from rest_framework.authtoken.views import obtain_auth_token
-from user_orders.views import LoginView  
+#from user_orders.views import LoginView  
    
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,6 +27,8 @@ urlpatterns = [
     path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
-    path('api/login/', LoginView.as_view(), name='api-login'),  
+    #path('api/login/', LoginView.as_view(), name='api-login'),  
+    path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     ]

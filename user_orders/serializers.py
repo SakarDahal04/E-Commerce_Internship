@@ -2,6 +2,8 @@ from .models import Address, Order, OrderItem, Payment
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from Products.models import Product
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 # Serializers
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -97,3 +99,16 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
         return user
+
+
+
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data['user_id'] = self.user.id
+        data['username'] = self.user.username
+        return data
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
