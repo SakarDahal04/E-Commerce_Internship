@@ -19,7 +19,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.conf import settings
 from django.utils.decorators import method_decorator
-
+from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
@@ -42,6 +42,7 @@ class CartRetrieveAPIView(generics.RetrieveAPIView):
 class CartItemAddAPIView(generics.CreateAPIView):
     serializer_class = CartItemSerializer
     permission_classes = [IsAuthenticated]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
     def perform_create(self, serializer):
         user = self.request.user
@@ -61,7 +62,8 @@ class CartItemAddAPIView(generics.CreateAPIView):
 class CartItemRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CartItemSerializer
     permission_classes = [IsAuthenticated]
-
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
+    
     def get_queryset(self):
         items = CartItem.objects.select_related('product', 'cart__user').filter(cart__user = self.request.user)
         return items
