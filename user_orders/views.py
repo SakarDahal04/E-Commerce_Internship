@@ -36,6 +36,9 @@ class AddressViewSet(viewsets.ModelViewSet):
 
 
 
+
+
+
 #@method_decorator(vary_on_cookie, name='list')
 #@method_decorator(cache_page(60 * 15), name='list')
 #@method_decorator(vary_on_cookie, name='retrieve')
@@ -52,7 +55,10 @@ class OrderViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    
+
+
+
+
 #@method_decorator(vary_on_cookie, name='list')
 #@method_decorator(cache_page(60 * 15), name='list')
 #@method_decorator(vary_on_cookie, name='retrieve')
@@ -120,6 +126,9 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
 
 
+
+
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -138,8 +147,15 @@ class UserViewSet(viewsets.ModelViewSet):
         
 
 
+
+
+
+
+
 class LoginView(ObtainAuthToken):
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
+    authentication_classes = []
+    permission_classes = [AllowAny]
     def post(self, request, *args, **kwargs):
         
         serializer = self.serializer_class(data=request.data,

@@ -7,8 +7,6 @@ from Products.models import Product
 # Create your models here.
 
 #address model
-# This model is used to store user addresses for orders
-# It includes a foreign key to the User model
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete = models.CASCADE)
     street = models.CharField(max_length = 225)
@@ -23,8 +21,6 @@ class Address(models.Model):
 
 
 #order model
-# This model is used to store orders placed by users
-# It includes a foreign key to the User model and a foreign key to the Product model
 class Order(models.Model):
     
     user = models.ForeignKey(User, on_delete = models.CASCADE)
@@ -44,8 +40,6 @@ class Order(models.Model):
 
 
 #order items model
-# This model is used to store items in an order
-# It includes a foreign key to the Order model and a foreign key to the User model
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete = models.CASCADE, related_name='items')
    # user = models.ForeignKey(User, on_delete = models.CASCADE)
@@ -62,8 +56,6 @@ class OrderItem(models.Model):
 
 
 #payment model
-# This model is used to store payment information for an order
-# It includes a foreign key to the Order model and a foreign key to the User model
 class Payment(models.Model):
     order = models.ForeignKey(Order, on_delete = models.CASCADE)
     user = models.ForeignKey(User, on_delete = models.CASCADE)
