@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from Products.models import Product
+from product.models import Product
 
 
 
@@ -19,7 +19,6 @@ class Address(models.Model):
 
     def __str__(self):
         return f"{self.street}, {self.city}, {self.state}, {self.postal_code}, {self.country} - {self.user.username}"
-
 
 
 #order model

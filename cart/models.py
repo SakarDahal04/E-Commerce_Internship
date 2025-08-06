@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from product.models import Product
 
 import uuid
 
@@ -11,16 +12,6 @@ class AbstractDateModel(models.Model):
     class Meta:
         abstract = True
 
-# dummy model for Products
-class Product(AbstractDateModel):
-    name = models.CharField(max_length=256)
-    description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    stock = models.PositiveIntegerField()
-
-    def __str__(self):
-        return f"Product: {self.name}"
-    
 # dummy model for Orders
 class Order(AbstractDateModel):
     class OrderStatusChoices(models.TextChoices):
