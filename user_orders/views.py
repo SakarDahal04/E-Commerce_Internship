@@ -37,8 +37,8 @@ class AddressViewSet(viewsets.ModelViewSet):
 
 
 
-@method_decorator(cache_page(60 * 15), name='list')
-@method_decorator(cache_page(60 * 15), name='retrieve') 
+#@method_decorator(cache_page(60 * 15), name='list')
+#@method_decorator(cache_page(60 * 15), name='retrieve') 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated, IsOrderOwner]
@@ -54,8 +54,8 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     
 
-@method_decorator(cache_page(60 * 15), name='list')
-@method_decorator(cache_page(60 * 15), name='retrieve') 
+#@method_decorator(cache_page(60 * 15), name='list')
+#@method_decorator(cache_page(60 * 15), name='retrieve') 
 class OrderItemViewSet(viewsets.ReadOnlyModelViewSet):
     permission_class = [IsAuthenticated, IsOrderItemOwner]
 
@@ -64,13 +64,7 @@ class OrderItemViewSet(viewsets.ReadOnlyModelViewSet):
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
     def get_queryset(self):
-        return OrderItem.objects.filter(user = self.request.user)
-    
-    def get_queryset(self):
-        return OrderItem.objects.filter(order_user = self.request.user)
-
-    def list(self, request, *args, **kwargs):
-        raise PermissionDenied("Listing all items is not allowd")
+        return OrderItem.objects.filter(order__user = self.request.user)
 
 
 
