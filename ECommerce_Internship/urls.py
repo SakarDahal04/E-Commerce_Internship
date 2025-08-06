@@ -40,5 +40,5 @@ urlpatterns = [
 
     path('o/', include(oauth2_urls)), # oauth access token
     path('api-auth/', include('rest_framework.urls')),
-]
+]+ debug_toolbar_urls()
 
