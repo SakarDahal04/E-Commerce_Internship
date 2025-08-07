@@ -8,5 +8,3 @@ admin.site.register(Tags)
 admin.site.register(Product)
 admin.site.register(ProductTags)
 admin.site.register(Review)
-
-

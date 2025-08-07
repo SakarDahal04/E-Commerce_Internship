@@ -8,7 +8,7 @@ from product.api.views import (
     TagDetailAPIView,
     StripeAPIPayment,
     ReviewListCreateAPIView,
-    ReviewDetailAPIView
+    ReviewDetailAPIView,
 )
 
 urlpatterns = [
@@ -26,8 +26,9 @@ urlpatterns = [
     ),
     path("tags/", TagListCreateAPIView.as_view(), name="tags-list-create"),
     path("tags/<int:pk>/", TagDetailAPIView.as_view(), name="tags-detail"),
-    path("payment/", StripeAPIPayment.as_view(), name="stripe-create-execute"), #api/product/payment/
-
+    path(
+        "payment/", StripeAPIPayment.as_view(), name="stripe-create-execute"
+    ),  # api/product/payment/
     path("review/", ReviewListCreateAPIView.as_view(), name="review-list-create"),
     path("review/<int:pk>/", ReviewDetailAPIView.as_view(), name="review-detail"),
 ]
