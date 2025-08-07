@@ -57,7 +57,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 #@method_decorator(cache_page(60 * 15), name='list')
 #@method_decorator(cache_page(60 * 15), name='retrieve') 
 class OrderItemViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_class = [IsAuthenticated, IsOrderItemOwner]
+    permission_classes = [IsAuthenticated, IsOrderItemOwner]
 
     serializer_class = OrderItemSerializer
 
