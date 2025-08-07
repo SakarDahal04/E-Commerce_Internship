@@ -7,7 +7,7 @@ class PermManager(BasePermission):
     
 class IsObjectOwner(PermManager):
     def has_object_permission(self, request, view, obj):
-        return obj.order.user == request.user
+        return obj.user == request.user
 
 class IsOrderItemOwner(BasePermission):
     def has_object_permission(self, request, view, obj):
