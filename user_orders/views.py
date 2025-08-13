@@ -45,15 +45,23 @@ class AddressViewSet(viewsets.ModelViewSet):
 #@method_decorator(cache_page(60 * 15), name='retrieve') 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated, IsOrderOwner]
+    #permission_classes = [IsAuthenticated, IsOrderOwner]
+    permission_classes = [AllowAny]
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
     def get_queryset(self):
-        print("Filtering orders for user:", self.request.user)
+        # print("Filtering orders for user:", self.request.user)
         return Order.objects.filter(user=self.request.user)
+        #return Order.objects.all()
 
+    # def perform_create(self, serializer):
+    #     serializer.save(user=self.request.user)
+
+    
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        # Pick any existing user in your DB for testing
+        test_user = User.objects.first()  # or User.objects.get(pk=1)
+        serializer.save(user=test_user)
 
 
 

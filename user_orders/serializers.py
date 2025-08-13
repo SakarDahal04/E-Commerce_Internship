@@ -13,20 +13,23 @@ class AddressSerializer(serializers.ModelSerializer):
         read_only_fields = ['user'] 
 
 
+# Temporary Product Serializer
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ["name", "description", "price", "created_at"]
+        read_only_fields = ["price"]
+
+
+
 class OrderItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only = False)
     class Meta:
         model = OrderItem
         fields = ['product', 'quantity', 'price']
         read_only_fields = ['price']
    
 
-
-
-class OrderItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderItem
-        fields = ['product', 'quantity', 'price']
-        read_only_fields = ['price']
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -112,3 +115,5 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
+
