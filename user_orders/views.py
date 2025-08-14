@@ -81,6 +81,11 @@ class OrderItemViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         return OrderItem.objects.filter(order__user=self.request.user)
     
+    @action(detail=False, url_path='by-order/(?P<order_id>[^/.]+)')
+    def by_order(self, request, order_id=None):
+        items = self.get_queryset().filter(order_id=order_id)
+        serializer = self.get_serializer(items, many=True)
+        return Response(serializer.data)
 
 
 

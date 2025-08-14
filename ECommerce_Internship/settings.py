@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from datetime import timedelta
+from corsheaders.defaults import default_headers
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -35,6 +36,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -184,11 +186,19 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
 }
 
-CORS_ALLOWED_ORIGINS = [
-   "http://localhost:5174", 
+# CORS_ALLOWED_ORIGINS = [
+#    "http://localhost:5174", 
 
+#]
+
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'Authorization',
 ]
 
-CORS_ALLOWED_CREDENTIALS = True
 
-# CORS_ALLOWED_ALL_ORIGINS = True
+
+
