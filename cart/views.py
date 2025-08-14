@@ -55,8 +55,10 @@ class CartItemAddAPIView(generics.CreateAPIView):
             cart_item = CartItem.objects.get(cart=cart, product=product)
             cart_item.quantity += quantity
             cart_item.save()
+            print("-------------It will update--------------------")
         except CartItem.DoesNotExist:
             serializer.save(cart=cart)
+            print("--------------------it will create new--------------------")
 
 
 class CartItemRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
@@ -131,6 +133,7 @@ class CheckoutRequestView(APIView):
     # When the request from the frontend is sent, it should send back the list of 
     def patch(self, request):
         items_data = request.data
+        print("Before the serializer",items_data)
 
         if not isinstance(items_data, list) or not items_data:
             return Response(
@@ -145,7 +148,7 @@ class CheckoutRequestView(APIView):
                 serializer = CartItemUpdateSerializer(instance, data=item_data, partial=True)
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
-                print(serializer.data)
+                print("Updated Data: ",serializer.data)
                 updated_count += 1
             except CartItem.DoesNotExist:
                 continue
@@ -156,6 +159,8 @@ class CheckoutRequestView(APIView):
         user = request.user
 
         cart_items = CartItem.objects.filter(cart__user = user, selected_for_checkout=True)
+
+        print("Obtained Cart Items for checkout", cart_items)
 
         if not cart_items.exists():
             return Response({"detail": "No items is selected for checkout"}, status=status.HTTP_400_BAD_REQUEST)

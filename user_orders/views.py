@@ -122,13 +122,13 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     
-    throttle_classes = [UserRateThrottle, AnonRateThrottle]
+    # throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
     def get_permissions(self):
         if self.action == 'create':
             permission_classes = [AllowAny]
         else:
-            permission_classes = [IsAuthenticated]
+            permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
@@ -152,6 +152,7 @@ class UserViewSet(viewsets.ModelViewSet):
         
    
         token, created = Token.objects.get_or_create(user=user)
+        print("hello world")
         
         return Response({
             'token': token.key,

@@ -81,17 +81,17 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        password= validated_data.pop('password', None)
+        password = validated_data.pop('password', None)
         if not password:
             raise serializers.ValidationError({"password": "Password is required."})
+
         user = User.objects.create_user(
             username=validated_data['username'],
-            password=password,
             email=validated_data.get('email', ''),
             first_name=validated_data.get('first_name', ''),
             last_name=validated_data.get('last_name', ''),
             is_staff=validated_data.get('is_staff', False),
-            is_active=validated_data.get('is_active', True)
+            is_active=validated_data.get('is_active', True),
+            password=password  
         )
-
         return user
