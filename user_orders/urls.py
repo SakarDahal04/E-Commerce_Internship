@@ -1,5 +1,5 @@
 
-from user_orders.views import AddressViewSet, OrderViewSet, OrderItemViewSet, PaymentViewSet, UserViewSet
+from user_orders.views import AddressViewSet, OrderViewSet, OrderItemViewSet, PaymentViewSet, UserViewSet, LoginView
 from rest_framework import routers
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
