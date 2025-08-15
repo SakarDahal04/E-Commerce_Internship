@@ -54,8 +54,8 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     
 
-#@method_decorator(cache_page(60 * 15), name='list')
-#@method_decorator(cache_page(60 * 15), name='retrieve') 
+# @method_decorator(cache_page(60 * 15), name='list')
+# @method_decorator(cache_page(60 * 15), name='retrieve') 
 class OrderItemViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated, IsOrderItemOwner]
 
@@ -63,8 +63,19 @@ class OrderItemViewSet(viewsets.ReadOnlyModelViewSet):
 
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
+    # def get_queryset(self):
+    #     return OrderItem.objects.filter(user = self.request.user)
+    
     def get_queryset(self):
-        return OrderItem.objects.filter(order__user = self.request.user)
+        print("Hellooooooooooo ",self.request.user)
+        # return OrderItem.objects.filter(order__user = self.request.user)
+        return OrderItem.objects.select_related('product', 'order').filter(order__user = self.request.user)
+
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 

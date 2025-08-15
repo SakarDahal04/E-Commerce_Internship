@@ -2,7 +2,7 @@ from rest_framework import serializers
 from product.models import Product, Category, Tags, Review, ProductTags
 
 
-class CategorySerialzier(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = "__all__"
@@ -15,7 +15,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    category = CategorySerialzier()
+    category = CategorySerializer()
     tags = TagSerializer()
     average_rating = serializers.SerializerMethodField()
 
