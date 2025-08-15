@@ -23,10 +23,14 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only = False)
+    product = ProductSerializer(read_only = True)
+    
+    product_id = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.all(), write_only=True, source='product'
+    )
     class Meta:
         model = OrderItem
-        fields = ['product', 'quantity', 'price']
+        fields = ['product', 'product_id', 'quantity', 'price']
         read_only_fields = ['price']
    
 

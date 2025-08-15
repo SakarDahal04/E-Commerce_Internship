@@ -48,6 +48,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     #permission_classes = [IsAuthenticated, IsOrderOwner]
     permission_classes = [AllowAny]
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
+    # pagination_class = None
 
     def get_queryset(self):
         # print("Filtering orders for user:", self.request.user)
@@ -77,6 +78,7 @@ class OrderItemViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = OrderItemSerializer
 
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
+    
 
     def get_queryset(self):
         return OrderItem.objects.filter(order__user=self.request.user)
