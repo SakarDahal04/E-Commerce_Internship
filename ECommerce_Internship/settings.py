@@ -208,6 +208,10 @@ STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET=os.environ.get('STRIPE_WEBHOOK_SECRET')
 
+CSRF_TRUSTED_ORIGIN = ["https://4bab8ac54161.ngrok-free.app"]
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # CSRF_TRUSTED_ORIGIN = ["https://4bab8ac54161.ngrok-free.app"]
 
 # CORS_ALLOW_ALL_ORIGINS = True
