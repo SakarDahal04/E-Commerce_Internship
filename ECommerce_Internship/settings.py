@@ -209,7 +209,26 @@ STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET=os.environ.get('STRIPE_WEBHOOK_SECRET')
 
+<<<<<<< Updated upstream
 CSRF_TRUSTED_ORIGIN = ["https://4bab8ac54161.ngrok-free.app"]
+=======
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# CSRF_TRUSTED_ORIGIN = ["https://4bab8ac54161.ngrok-free.app"]
+
+# CORS_ALLOW_ALL_ORIGINS = True
+
+# Allow only your frontend origin, not *
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+]
+
+# Allow credentials (cookies)
+CORS_ALLOW_CREDENTIALS = True
+
+>>>>>>> Stashed changes
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=40),
