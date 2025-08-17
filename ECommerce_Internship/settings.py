@@ -209,9 +209,6 @@ STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET=os.environ.get('STRIPE_WEBHOOK_SECRET')
 
-<<<<<<< Updated upstream
-CSRF_TRUSTED_ORIGIN = ["https://4bab8ac54161.ngrok-free.app"]
-=======
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -228,7 +225,6 @@ CORS_ALLOWED_ORIGINS = [
 # Allow credentials (cookies)
 CORS_ALLOW_CREDENTIALS = True
 
->>>>>>> Stashed changes
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=40),
