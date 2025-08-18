@@ -14,7 +14,7 @@ from rest_framework import generics
 from product.api.serializers import (
     ProductSerializer,
     ProductTagSerializer,
-    CategorySerialzier,
+    CategorySerializer,
     TagSerializer,
     PaymentSerializer,
     ReviewSerializer,
@@ -93,7 +93,7 @@ class ProductDetailAPIView(
 class CategoryListCreateAPIView(
     mixins.CreateModelMixin, mixins.ListModelMixin, generics.GenericAPIView
 ):
-    serializer_class = CategorySerialzier
+    serializer_class = CategorySerializer
     queryset = Category.objects.all()
 
     def get_permissions(self):
@@ -115,8 +115,8 @@ class CategoryDetailAPIView(
     mixins.DestroyModelMixin,
     generics.GenericAPIView,
 ):
-    serializer_class = CategorySerialzier
-    queryset = Category.objects.all().order_by("name")
+    serializer_class = CategorySerializer
+    queryset = Category.objects.all().order_by('name')
 
     def get_permissions(self):
         if self.request.method == "GET":

@@ -46,7 +46,7 @@ class CartItemUpdateSerializer(serializers.ModelSerializer):
         if value is None:
             raise serializers.ValidationError("Item is not selected for the checkout")
 
-        value = True
+        # value = True
         return value
 
     class Meta:

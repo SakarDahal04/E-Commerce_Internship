@@ -2,6 +2,9 @@ from .models import Address, Order, OrderItem, Payment
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from product.models import Product
+
+
+from product.api.serializers import ProductSerializer
 # Serializers
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -12,23 +15,23 @@ class AddressSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    # product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    product = ProductSerializer(read_only=True)
     order = serializers.StringRelatedField(read_only=True) 
 
     class Meta:
         model = OrderItem
-        fields = ['product', 'quantity', 'price','order']
-        read_only_fields = ['order', 'price']
+        fields = ['product', 'quantity', 'order']
+        # read_only_fields = ['price']
    
-
 
 class OrderSerializer(serializers.ModelSerializer):
     order_items = OrderItemSerializer(many=True, source='items')
 
     class Meta:
         model = Order
-        fields = ['id', 'status', 'total_price', 'created_at', 'updated_at', 'order_items']
-        read_only_fields = ['status', 'total_price', 'created_at', 'updated_at']
+        fields = ['id', 'created_at', 'updated_at', 'total_price', 'order_items']
+        read_only_fields = ['created_at', 'updated_at', 'total_price']
 
     def create(self, validated_data):
         items_data = validated_data.pop('items')
@@ -47,16 +50,10 @@ class OrderSerializer(serializers.ModelSerializer):
 
             total_price += price * quantity
 
-            OrderItem.objects.create(
-                order=order,
-                product=product,
-                quantity=quantity,
-                price=price
-            )
-
-        
-        order.total_price = total_price
-        order.save()
+        for item_data in order_items_data:
+            item_data.pop('user', None)
+            product = item_data['product']
+            OrderItem.objects.create(order=order, user=user, **item_data)
 
         return order
 
@@ -81,17 +78,17 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        password= validated_data.pop('password', None)
+        password = validated_data.pop('password', None)
         if not password:
             raise serializers.ValidationError({"password": "Password is required."})
+
         user = User.objects.create_user(
             username=validated_data['username'],
-            password=password,
             email=validated_data.get('email', ''),
             first_name=validated_data.get('first_name', ''),
             last_name=validated_data.get('last_name', ''),
             is_staff=validated_data.get('is_staff', False),
-            is_active=validated_data.get('is_active', True)
+            is_active=validated_data.get('is_active', True),
+            password=password  
         )
-
         return user

@@ -54,8 +54,8 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     
 
-#@method_decorator(cache_page(60 * 15), name='list')
-#@method_decorator(cache_page(60 * 15), name='retrieve') 
+# @method_decorator(cache_page(60 * 15), name='list')
+# @method_decorator(cache_page(60 * 15), name='retrieve') 
 class OrderItemViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated, IsOrderItemOwner]
 
@@ -63,8 +63,19 @@ class OrderItemViewSet(viewsets.ReadOnlyModelViewSet):
 
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
+    # def get_queryset(self):
+    #     return OrderItem.objects.filter(user = self.request.user)
+    
     def get_queryset(self):
-        return OrderItem.objects.filter(order__user = self.request.user)
+        print("Hellooooooooooo ",self.request.user)
+        # return OrderItem.objects.filter(order__user = self.request.user)
+        return OrderItem.objects.select_related('product', 'order').filter(order__user = self.request.user)
+
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 
@@ -122,13 +133,13 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     
-    throttle_classes = [UserRateThrottle, AnonRateThrottle]
+    # throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
     def get_permissions(self):
         if self.action == 'create':
             permission_classes = [AllowAny]
         else:
-            permission_classes = [IsAuthenticated]
+            permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
@@ -136,7 +147,7 @@ class UserViewSet(viewsets.ModelViewSet):
         
 
 
-""" class LoginView(ObtainAuthToken):
+class LoginView(ObtainAuthToken):
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
     permission_classes = [AllowAny]
     authentication_classes = []
@@ -152,9 +163,10 @@ class UserViewSet(viewsets.ModelViewSet):
         
    
         token, created = Token.objects.get_or_create(user=user)
+        print("hello world")
         
         return Response({
             'token': token.key,
             'user_id': user.pk,
             'username': user.username
-        }) """
+        })

@@ -1,5 +1,5 @@
 
-from user_orders.views import AddressViewSet, OrderViewSet, OrderItemViewSet, PaymentViewSet, UserViewSet
+from user_orders.views import AddressViewSet, OrderViewSet, OrderItemViewSet, PaymentViewSet, UserViewSet, LoginView
 from rest_framework import routers
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
@@ -24,4 +24,5 @@ urlpatterns = [
     path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('', include(router.urls)), 
+    path('login/', LoginView.as_view(), name='login'),
 ]
