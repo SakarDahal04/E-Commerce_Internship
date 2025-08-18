@@ -44,6 +44,8 @@ class Product(CreateUpdateDate):
     description = models.TextField(max_length=500, blank=True)
     price = models.DecimalField(max_digits=9, decimal_places=2)
     stock = models.PositiveIntegerField()
+    tag_id = models.ForeignKey(
+    Tags, on_delete=models.CASCADE, related_name="tag_producttags", null=True, blank=True)
     image = models.ImageField(upload_to="products/", null=True, blank=True) 
 
 

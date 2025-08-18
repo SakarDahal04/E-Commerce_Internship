@@ -71,9 +71,8 @@ class ProductDetailAPIView(
     serializer_class = ProductSerializer
     # queryset = Product.objects.select_related('category', 'tags').all()
     # did this but it limits product to only one tag
-    queryset = Product.objects.select_related("category").prefetch_related(
-        "product_producttags_tag_id"
-    )
+    queryset = Product.objects.all()
+    
 
     def get_permissions(self):
         if self.request.method == "GET":
