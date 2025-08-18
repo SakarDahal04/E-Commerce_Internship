@@ -34,9 +34,9 @@ class CustomProductThrottle(SimpleRateThrottle):
 class ProductListCreateAPIView(
     mixins.CreateModelMixin, mixins.ListModelMixin, generics.GenericAPIView
 ):
-    queryset = Product.objects.select_related("category").prefetch_related(
-        "product_producttags_tag_id"
-    )
+    # queryset = Product.objects.select_related("category").prefetch_related(
+    #     "product_producttags_tag_id"
+    # )
     # throttle_classes = [AnonRateThrottle]
     serializer_class = ProductSerializer
     queryset = Product.objects.all().order_by("name")
