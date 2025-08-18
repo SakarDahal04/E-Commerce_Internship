@@ -182,7 +182,7 @@ class CheckoutRequestView(APIView):
                 order=order,
                 product = item.product,
                 quantity = item.quantity,
-                price = item.product.price * item.quantity,
+                # price = item.product.price * item.quantity,
                 # item_subtotal = item.quantity * item.product.price
             )
 
