@@ -15,14 +15,12 @@ from rest_framework.views import APIView
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import AccessToken
 
-from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse
-from django.conf import settings
-from django.utils.decorators import method_decorator
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from decimal import Decimal
 
-from django.contrib.auth import get_user_model
+from django.conf import settings
+from django.db import transaction
+
 import stripe
 
 # Create your views here.
@@ -87,7 +85,7 @@ class CheckoutRequestView(APIView):
         
         return Response({"updated": updated_count}, status=status.HTTP_200_OK)
 
-    def post(self, request):
+    def post1(self, request):
         user = request.user
 
         cart_items = CartItem.objects.filter(cart__user = user, selected_for_checkout=True)
@@ -128,6 +126,65 @@ class CheckoutRequestView(APIView):
             "order_id": str(order.id),
             "total": str(order.total_price)
         }, status=status.HTTP_201_CREATED)
+
+    def post(self, request):
+        user = request.user
+        items_data = request.data
+        
+        if not isinstance(items_data, list) or not items_data:
+            return Response(
+                {"detail": "No items received for checkout"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        with transaction.atomic():
+            # Step 1: Update cart items to mark them for checkout
+            cart_items_ids = [item['id'] for item in items_data]
+            cart_items = CartItem.objects.filter(cart__user = user, id__in=cart_items_ids)
+
+            if not cart_items.exists():
+                return Response(
+                    {"detail": "No items found in the cart"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            total = Decimal(0.0)        
+
+            # Step 2: Validate stock and compute total
+            for item in cart_items.select_related('product'):
+                qty = next((i['quantity'] for i in items_data if i['id'] == item.id), item.quantity)
+                if qty > item.product.stock:
+                    return Response(
+                        {"detail": f"Not enough stock for {item.product.name} (Available: {item.product.stock})"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                
+                item.quantity = qty
+                item.selected_for_checkout = True
+                item.save()
+                total += (item.quantity * item.product.price)
+
+            # Step 3: Create the order
+            order = Order.objects.create(user=user, total_price=total, status="Pending")
+
+            # Step 4: Create the OrderItems and update the stock
+            for item in cart_items:
+                OrderItem.objects.create(
+                    order = order,
+                    product = item.product,
+                    quantity = item.quantity
+                )
+                item.product.stock -= item.quantity
+                item.product.save()
+
+            cart_items.delete()
+
+        return Response({
+            "detail": "Order Created Successfully",
+            "order_id": str(order.id),
+            "total": str(order.total_price),  
+        }, status=status.HTTP_201_CREATED)
+
 
     def delete(self, request):
         items_to_delete = request.data
