@@ -80,11 +80,6 @@ class OrderItemViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-
-
-
-
-
 class PaymentViewSet(viewsets.ModelViewSet):
     stripe.api_key = settings.STRIPE_SECRET_KEY
     queryset = Payment.objects.all()
