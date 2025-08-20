@@ -26,19 +26,6 @@ from django.contrib.auth import get_user_model
 import stripe
 
 # Create your views here.
-class CartRetrieveAPIView(generics.RetrieveAPIView):
-    serializer_class = CartSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        cart, created = Cart.objects.select_related('user').prefetch_related('items', 'items__product').get_or_create(user=self.request.user)
-        
-        for c in cart.items.all():
-            print(c)
-
-        return cart
-
-
 class CartItemAddAPIView(generics.CreateAPIView):
     serializer_class = CartItemSerializer
     permission_classes = [IsAuthenticated]
@@ -60,61 +47,6 @@ class CartItemAddAPIView(generics.CreateAPIView):
             serializer.save(cart=cart)
             print("--------------------it will create new--------------------")
 
-
-class CartItemRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = CartItemSerializer
-    permission_classes = [IsAuthenticated]
-    throttle_classes = [UserRateThrottle, AnonRateThrottle]
-    
-    def get_queryset(self):
-        items = CartItem.objects.select_related('product', 'cart__user').filter(cart__user = self.request.user)
-        return items
-
-
-class OrderCheckoutCreateAPIView(generics.CreateAPIView):
-    serializer_class = OrderCreateSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_serializer_context(self):
-        return {'request': self.request}
-    
-
-class BulkDataUpdateAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def patch(self, request):
-        items_data = request.data.get('items', [])
-        if not isinstance(items_data, list) or not items_data:
-            return Response(
-                {"detail": "A non-empty list of items is required."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        updated_count = 0
-        for item_data in items_data:
-            item_id = item_data.get("id")
-            selected = item_data.get("selected_for_checkout")
-
-            if item_id is None or selected is None:
-                continue  # Skip incomplete entries
-
-            try:
-                if request.user.is_authenticated:
-                    cart_item = CartItem.objects.get(id=item_id, cart__user=request.user)
-                else:
-                    cart_item = CartItem.objects.get(id=item_id)
-
-                # cart_item = CartItem.objects.get(id=item_id, cart__user=request.user)
-                cart_item.selected_for_checkout = selected
-                cart_item.save(update_fields=["selected_for_checkout"])
-                updated_count += 1
-                print("done with the updation")
-            except CartItem.DoesNotExist:
-                print("cart item doesnt exist")
-                continue  # Ignore invalid IDs
-
-        return Response({"updated": updated_count, "next":"/cart/checkout/"}, status=status.HTTP_200_OK)
-    
 # Finalized view to run when we click on Cart in the Frontend
 class CartItemListView(generics.ListAPIView):
     serializer_class = CartItemSerializer
@@ -187,6 +119,7 @@ class CheckoutRequestView(APIView):
             )
 
             item.product.stock -= item.quantity
+            item.product.save()
 
         cart_items.delete()
 
@@ -213,75 +146,64 @@ class CheckoutRequestView(APIView):
 
         return Response({"deleted": "Items deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
-# class CartItemDeleteAPIView()
-
-
-# class CartItemUpdateView(generics.RetrieveUpdateAPIView):
-#     serializer_class = CartItemUpdateSerializer
-#     permission_classes = [IsAuthenticated]
-
-#     def get_queryset(self):
-#         return CartItem.objects.filter(cart__user=self.request.user)
-
 
 # # @method_decorator()
-# class StripeCheckoutSessionAPIView(APIView):
-#     stripe.api_key = settings.STRIPE_SECRET_KEY
-#     template_name = 'cart/stripe.html'
-#     # permission_classes = [IsAuthenticated]
+class StripeCheckoutSessionAPIView(APIView):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    template_name = 'cart/stripe.html'
+    # permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        return render(request, self.template_name)
 
-#     def get(self, request):
-#         return render(request, self.template_name)
+    def post(self, request):
 
-#     def post(self, request):
+        # hardcoded_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU0MzA5MzI3LCJpYXQiOjE3NTQzMDY5MjcsImp0aSI6ImI3ODBlMjU4MTlhODQwZGE4YzNlYjc1NzViM2RhYTRhIiwidXNlcl9pZCI6IjIifQ.uBUPhZKrPVuKy7ryWH3VLZvybok32ueS1QmSWCyKUdQ"
 
-#         hardcoded_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU0MzA5MzI3LCJpYXQiOjE3NTQzMDY5MjcsImp0aSI6ImI3ODBlMjU4MTlhODQwZGE4YzNlYjc1NzViM2RhYTRhIiwidXNlcl9pZCI6IjIifQ.uBUPhZKrPVuKy7ryWH3VLZvybok32ueS1QmSWCyKUdQ"
+        # try:
+        #     validated_token = AccessToken(hardcoded_token)
+        #     user_id = validated_token['user_id']
+        #     user = User.objects.get(id=user_id)
+        # except Exception as e:
+        #     return Response({"error": "Invalid hardcoded token"}, status=status.HTTP_401_UNAUTHORIZED)
 
-#         try:
-#             validated_token = AccessToken(hardcoded_token)
-#             user_id = validated_token['user_id']
-#             user = User.objects.get(id=user_id)
-#         except Exception as e:
-#             return Response({"error": "Invalid hardcoded token"}, status=status.HTTP_401_UNAUTHORIZED)
+        # order = Order.objects.get()
+        cart = Cart.objects.prefetch_related('items__product').get(user=request.user)
+        selected_items = cart.items.filter(selected_for_checkout=True)
 
-#         order = Order.objects.get()
-#         cart = Cart.objects.prefetch_related('items__product').get(user=user)
-#         selected_items = cart.items.filter(selected_for_checkout=True)
+        if not selected_items.exists():
+            return Response({"error": "None of the items were selected for checkout"}, status=status.HTTP_400_BAD_REQUEST)
 
-#         if not selected_items.exists():
-#             return Response({"error": "None of the items were selected for checkout"}, status=status.HTTP_400_BAD_REQUEST)
-
-#         line_items = []
-#         for item in selected_items:
-#             line_items.append({
-#                 "price_data": {
-#                     "currency": "usd",
-#                     "product_data": {
-#                         "name": item.product.name
-#                     },
-#                     'unit_amount': int(item.product.price * 100)
-#                 },
-#                 "quantity": item.quantity
-#             })
+        line_items = []
+        for item in selected_items:
+            line_items.append({
+                "price_data": {
+                    "currency": "usd",
+                    "product_data": {
+                        "name": item.product.name
+                    },
+                    'unit_amount': int(item.product.price * 100)
+                },
+                "quantity": item.quantity
+            })
             
-#         checkout_session = stripe.checkout.Session.create(
-#             payment_method_types=['card'],
-#             mode='payment',
-#             # customer_email=request.user.email,
-#             line_items=line_items,
-#             success_url = "http://127.0.0.1:8000/cart/payment-success?session_id={CHECKOUT_SESSION_ID}/",
-#             cancel_url = "http://127.0.0.1:8000/cart/payment-cancel/",
-#             metadata={'user_id': user.id}
-#         )
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            mode='payment',
+            # customer_email=request.user.email,
+            line_items=line_items,
+            success_url = "http://127.0.0.1:8000/cart/payment-success?session_id={CHECKOUT_SESSION_ID}/",
+            cancel_url = "http://127.0.0.1:8000/cart/payment-cancel/",
+            metadata={'user_id': request.user.id}
+        )
 
         
 
-#         # return Response({'sessionId': checkout_session.id})
+        # return Response({'sessionId': checkout_session.id})
 
-#         print("Redirecting to...", checkout_session.url)
+        print("Redirecting to...", checkout_session.url)
 
-#         return redirect(checkout_session.url)
+        return redirect(checkout_session.url)
 
 # class StripeWebhook(APIView):
 #     def post(self, request):
