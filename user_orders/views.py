@@ -63,13 +63,16 @@ class OrderItemViewSet(viewsets.ReadOnlyModelViewSet):
 
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
-    # def get_queryset(self):
-    #     return OrderItem.objects.filter(user = self.request.user)
-    
     def get_queryset(self):
         print("Hellooooooooooo ",self.request.user)
         # return OrderItem.objects.filter(order__user = self.request.user)
-        return OrderItem.objects.select_related('product', 'order').filter(order__user = self.request.user)
+        queryset = OrderItem.objects.select_related('product', 'order').filter(order__user = self.request.user)
+
+        order_id = self.request.query_params.get("order_id")
+        if order_id is not None:
+            queryset = queryset.filter(order__id=order_id)
+        
+        return queryset
 
 
     def list(self, request, *args, **kwargs):
