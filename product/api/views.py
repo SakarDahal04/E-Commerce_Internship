@@ -1,6 +1,7 @@
 from rest_framework import mixins
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
+# from rest_framework import filters
+from rest_framework.filters import SearchFilter
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from rest_framework.response import Response
@@ -19,6 +20,7 @@ from product.api.serializers import (
     PaymentSerializer,
     ReviewSerializer,
 )
+from product.api.filters import ProductFilter
 
 from django.conf import settings
 from product.models import Product, ProductTags, Category, Tags, Review
@@ -40,9 +42,10 @@ class ProductListCreateAPIView(
     # throttle_classes = [AnonRateThrottle]
     serializer_class = ProductSerializer
     queryset = Product.objects.all().order_by("name")
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, SearchFilter)
     filterset_fields = ["category", "tags", "price"]
     search_fields = ["name"]
+    filterset_class = ProductFilter
 
     # filter and searches..
     # filter using price as well as tags, categories.
@@ -145,7 +148,7 @@ class TagListCreateAPIView(
             return [AllowAny()]
         return [IsAuthenticated()]
 
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [SearchFilter]
 
     search_fields = ["name"]
 
@@ -233,7 +236,7 @@ class ReviewListCreateAPIView(
     serializer_class = ReviewSerializer
     queryset = Review.objects.select_related("product").all()
 
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [SearchFilter]
     filterset_fields = ["rating"]
     search_fields = ["product"]
 
