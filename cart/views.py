@@ -20,6 +20,8 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.db import transaction
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 
 import stripe
 
@@ -85,48 +87,6 @@ class CheckoutRequestView(APIView):
         
         return Response({"updated": updated_count}, status=status.HTTP_200_OK)
 
-    def post1(self, request):
-        user = request.user
-
-        cart_items = CartItem.objects.filter(cart__user = user, selected_for_checkout=True)
-
-        print("Obtained Cart Items for checkout", cart_items)
-
-        if not cart_items.exists():
-            return Response({"detail": "No items is selected for checkout"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Validation for the checkout request and stock available
-        total = Decimal("0.00")
-
-        for item in cart_items:
-            total += (item.quantity * item.product.price)
-            if item.quantity > item.product.stock:
-                return Response({
-                    "detail": f"Not enough stock for {item.product.name} (Available: {item.product.stock})"
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-        order = Order.objects.create(user=user, total_price=total, status="Pending")
-
-        for item in cart_items:
-            OrderItem.objects.create(
-                order=order,
-                product = item.product,
-                quantity = item.quantity,
-                # price = item.product.price * item.quantity,
-                # item_subtotal = item.quantity * item.product.price
-            )
-
-            item.product.stock -= item.quantity
-            item.product.save()
-
-        cart_items.delete()
-
-        return Response({
-            "detail": "Order created successfully",
-            "order_id": str(order.id),
-            "total": str(order.total_price)
-        }, status=status.HTTP_201_CREATED)
-
     def post(self, request):
         user = request.user
         items_data = request.data
@@ -149,7 +109,6 @@ class CheckoutRequestView(APIView):
                 )
 
             total = Decimal(0.0)        
-
             # Step 2: Validate stock and compute total
             for item in cart_items.select_related('product'):
                 qty = next((i['quantity'] for i in items_data if i['id'] == item.id), item.quantity)
@@ -165,7 +124,7 @@ class CheckoutRequestView(APIView):
                 total += (item.quantity * item.product.price)
 
             # Step 3: Create the order
-            order = Order.objects.create(user=user, total_price=total, status="Pending")
+            order = Order.objects.create(user=user, total_price=total, status=Order.StatusChoices.PENDING)
 
             # Step 4: Create the OrderItems and update the stock
             for item in cart_items:
@@ -174,17 +133,37 @@ class CheckoutRequestView(APIView):
                     product = item.product,
                     quantity = item.quantity
                 )
-                item.product.stock -= item.quantity
-                item.product.save()
+            #     item.product.stock -= item.quantity
+            #     item.product.save()
 
-            cart_items.delete()
+            # cart_items.delete()
 
-        return Response({
-            "detail": "Order Created Successfully",
-            "order_id": str(order.id),
-            "total": str(order.total_price),  
-        }, status=status.HTTP_201_CREATED)
+            # Step 5: Create stripe checkout session
+            stripe_line_items = [
+                {
+                    'price_data': {
+                        'currency': 'usd',
+                        'unit_amount': int(item.product.price * 100),    # in cents
+                        'product_data': {'name': item.product.name}
+                    },
+                    'quantity': item.quantity
+                } for item in cart_items
+            ]
 
+            checkout_session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                mode='payment',
+                line_items=stripe_line_items,
+                success_url = "http://localhost:5173/orders?session_id={CHECKOUT_SESSION_ID}/",
+                cancel_url = "http://localhost:5173/orders/",
+                metadata={
+                    'user_id': request.user.id, 
+                    'order_id': str(order.id), 
+                    'cart_items': ",".join(str(item.id) for item in cart_items)                 }
+            )
+
+        # Step 5: Return Stripe URL to frontend
+        return Response({"checkout_url": checkout_session.url, "order_id": order.id}, status=status.HTTP_200_OK)
 
     def delete(self, request):
         items_to_delete = request.data
@@ -203,6 +182,41 @@ class CheckoutRequestView(APIView):
 
         return Response({"deleted": "Items deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
+
+@csrf_exempt
+def stripe_webhook(request):
+    print("Inside of the stripe webhook")
+
+    payload = request.body
+    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+    endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
+
+    event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
+
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+
+        order_id = session['metadata']['order_id']
+        cart_items_str = session['metadata'].get('cart_items', '')
+
+        order = Order.objects.get(id=order_id)
+        order.status = Order.StatusChoices.APPROVED
+        order.save()
+
+        # Delete cart items
+        if cart_items_str:
+            cart_item_ids = [int(i) for i in cart_items_str.split(",") if i]
+            cart_items = CartItem.objects.filter(id__in=cart_item_ids, cart__user=order.user)
+
+            for item in cart_items.select_related("product"):
+                # decrease stock
+                item.product.stock -= item.quantity
+                item.product.save()
+
+            # finally delete from cart
+            cart_items.delete()
+
+    return HttpResponse(status=200)
 
 # # @method_decorator()
 class StripeCheckoutSessionAPIView(APIView):

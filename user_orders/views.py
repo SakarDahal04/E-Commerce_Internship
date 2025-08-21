@@ -57,7 +57,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 # @method_decorator(cache_page(60 * 15), name='list')
 # @method_decorator(cache_page(60 * 15), name='retrieve') 
 class OrderItemViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [IsAuthenticated, IsOrderItemOwner]
+    # permission_classes = [IsAuthenticated, IsOrderItemOwner]
 
     serializer_class = OrderItemSerializer
 
@@ -66,7 +66,10 @@ class OrderItemViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         print("Hellooooooooooo ",self.request.user)
         # return OrderItem.objects.filter(order__user = self.request.user)
-        queryset = OrderItem.objects.select_related('product', 'order').filter(order__user = self.request.user)
+        # queryset = OrderItem.objects.select_related('product', 'order').filter(order__user = self.request.user)
+
+        queryset = OrderItem.objects.select_related('product', 'order')
+
 
         order_id = self.request.query_params.get("order_id")
         if order_id is not None:

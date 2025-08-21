@@ -25,11 +25,16 @@ class Address(models.Model):
 # This model is used to store orders placed by users
 # It includes a foreign key to the User model and a foreign key to the Product model
 class Order(models.Model):
-    
+    class StatusChoices(models.TextChoices):
+        PENDING = "pending", "Pending"
+        PROCESSING = "processing", "Processing"
+        APPROVED = "approved", "Approved"
+        REJECTED = "cancelled", "Cancelled"
+        
     user = models.ForeignKey(User, on_delete = models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    status = models.CharField(max_length=50, default='Pending')
+    status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.PENDING)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:

@@ -13,12 +13,17 @@ class AddressSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['user'] 
 
+class OrderDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['id', 'status', 'total_price']
+        read_only_fields = ['id', 'status', 'total_price']
 
 class OrderItemSerializer(serializers.ModelSerializer):
     # product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     product = ProductSerializer(read_only=True)
-    order = serializers.StringRelatedField(read_only=True) 
-
+    order = OrderDetailsSerializer(read_only = True)
+    
     class Meta:
         model = OrderItem
         fields = ['product', 'quantity', 'order']
@@ -43,17 +48,16 @@ class OrderSerializer(serializers.ModelSerializer):
         order = Order.objects.create(user=user, total_price=0)  
 
         
+        # Step 2: Create OrderItem instances
         for item_data in items_data:
             product = item_data['product']
             quantity = item_data['quantity']
-            price = product.price
+            OrderItem.objects.create(order=order, product=product, quantity=quantity)
+            total_price += product.price * quantity
 
-            total_price += price * quantity
-
-        for item_data in order_items_data:
-            item_data.pop('user', None)
-            product = item_data['product']
-            OrderItem.objects.create(order=order, user=user, **item_data)
+        # Step 3: Update total price on order
+        order.total_price = total_price
+        order.save()
 
         return order
 
