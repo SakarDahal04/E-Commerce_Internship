@@ -98,7 +98,7 @@ Backend will run at: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 The frontend connects to this backend at the base URL.
 For frontend setup, refer to the repository:
 
-* **Frontend Repo:** [React E-Commerce Frontend](https://github.com/SakarDahal04/E-Commerce_Internship_Frontend)
+* **Frontend Repo:** [React E-Commerce Frontend](https://github.com/SakarDahal04/E-Commerce_Internship_Frontend/develop)
 
 ---
 
